@@ -122,7 +122,7 @@ internal class New
             var r2 = client2.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/.kiwi/templates/main.py");
             r2.Wait();
 
-            File.WriteAllText($"{ProjectName}/main.py", "");
+            File.WriteAllText($"{ProjectName}/main.py", r2.Result);
             Console.WriteLine("Created 'main.py' file.");
         }
 
@@ -131,7 +131,6 @@ internal class New
             ProcessStartInfo psi = new(Data.Interpreter, "-m venv venv")
             {
                 RedirectStandardError = true,
-                RedirectStandardOutput = true,
                 CreateNoWindow = true,
                 UseShellExecute = false,
             };
@@ -144,10 +143,6 @@ internal class New
                 {
                     Console.WriteLine("Error while creating 'venv':");
                     Console.WriteLine(process.StandardError.ReadToEnd());
-                }
-                else
-                {
-                    Console.WriteLine(process.StandardOutput.ReadToEnd());
                 }
             }
 
