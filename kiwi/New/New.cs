@@ -82,7 +82,7 @@ internal class New
             if (JsonObject != null && (JsonObject.Directories == Array.Empty<string>() || JsonObject.Directories == null))
             {
                 HttpClient client = new();
-                var r = client.GetStringAsync("");
+                var r = client.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/.kiwi/json/NewConfig.json");
                 r.Wait();
 
                 JsonData? JsonObjectHttp = JsonConvert.DeserializeObject<JsonData>(r.Result);
@@ -110,7 +110,7 @@ internal class New
         if (Main)
         {
             HttpClient client2 = new();
-            var r2 = client2.GetStringAsync("");
+            var r2 = client2.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/.kiwi/templates/main.py");
             r2.Wait();
 
             File.WriteAllText($"{ProjectName}/main.py", "");
