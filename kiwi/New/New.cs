@@ -93,6 +93,15 @@ internal class New
                 if (JsonObject != null) Directories = JsonObject.Directories;
             }
         }
+        else
+        {
+            HttpClient client = new();
+            var r = client.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/.kiwi/json/NewConfig.json");
+            r.Wait();
+
+            JsonData? JsonObjectHttp = JsonConvert.DeserializeObject<JsonData>(r.Result);
+            if (JsonObjectHttp != null) Directories = JsonObjectHttp.Directories;
+        }
 
         foreach (string directory in Directories)
         {
