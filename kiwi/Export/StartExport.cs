@@ -84,7 +84,7 @@
                     Environment.Exit(1);
                 }
                 JsonData JsonObject = ParseJson();
-                if (JsonObject.Export != null && JsonObject.Export.DirectoriesToExport == Array.Empty<string>())
+                if (JsonObject.Export != null && JsonObject.Export.DirectoriesToExport.Length == 0)
                 {
                     Environment.Exit(1);
                 }
