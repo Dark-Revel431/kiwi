@@ -86,6 +86,7 @@
                 JsonData JsonObject = ParseJson();
                 if (JsonObject.Export != null && JsonObject.Export.DirectoriesToExport.Length == 0)
                 {
+                    Console.WriteLine("Exported.");
                     Environment.Exit(1);
                 }
                 if (Directory.Exists("kiwi/export"))
