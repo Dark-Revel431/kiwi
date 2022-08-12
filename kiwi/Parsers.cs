@@ -13,6 +13,7 @@ internal class Parsers
                 Run.StartRun.Start();
                 break;
             case "export":
+                Export.StartExport.Start();
                 break;
             case "package":
                 break;
