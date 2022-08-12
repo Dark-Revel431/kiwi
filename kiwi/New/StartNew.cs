@@ -151,7 +151,7 @@ internal class StartNew
         if (ReadMe)
         {
             Console.WriteLine("Creating 'README.md' file...");
-            File.Create("README.md");
+            File.Create($"{ProjectName}/README.md");
             Console.WriteLine("Created 'README.md' file.");
         }
 

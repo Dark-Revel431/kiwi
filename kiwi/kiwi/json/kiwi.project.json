@@ -12,6 +12,8 @@
   },
 
   "Export": {
+    "Zip": false,
+    "ZipExtension": ".zip",
     "DirectoriesToExport": [
       "%%ProjectName%%"
     ],
