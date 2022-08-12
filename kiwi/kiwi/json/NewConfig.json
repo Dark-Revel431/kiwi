@@ -1,8 +1,8 @@
 {
   // Directories to create
   "Directories": [
-    ".kiwi/plugins",
-    ".kiwi/export",
+    "kiwi/plugins",
+    "kiwi/export",
     "%%ProjectName%%"
   ]
 }

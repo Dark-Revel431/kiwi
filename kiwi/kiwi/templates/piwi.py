@@ -1,5 +1,5 @@
 ﻿import sys
-import .kiwi.plugins
+import kiwi.plugins
 
 
 if __name__ == "__main__":

@@ -102,7 +102,7 @@ internal class New
             if (JsonObject != null && (JsonObject.Directories == Array.Empty<string>() || JsonObject.Directories == null))
             {
                 HttpClient client = new();
-                var r = client.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/.kiwi/json/NewConfig.json");
+                var r = client.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/json/NewConfig.json");
                 r.Wait();
 
                 JsonData? JsonObjectHttp = JsonConvert.DeserializeObject<JsonData>(r.Result);
@@ -116,7 +116,7 @@ internal class New
         else
         {
             HttpClient client = new();
-            var r = client.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/.kiwi/json/NewConfig.json");
+            var r = client.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/json/NewConfig.json");
             r.Wait();
 
             JsonData? JsonObjectHttp = JsonConvert.DeserializeObject<JsonData>(r.Result);
@@ -141,7 +141,7 @@ internal class New
         {
             Console.WriteLine("Creating 'main.py' file.");
             HttpClient client2 = new();
-            var r2 = client2.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/.kiwi/templates/main.py");
+            var r2 = client2.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/templates/main.py");
             r2.Wait();
 
             File.WriteAllText($"{ProjectName}/main.py", r2.Result);
@@ -181,7 +181,7 @@ internal class New
 
         Console.WriteLine("Creating 'kiwi.project.json' file...");
         HttpClient client3 = new();
-        var r3 = client3.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/.kiwi/json/kiwi.project.json");
+        var r3 = client3.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/json/kiwi.project.json");
         r3.Wait();
 
         string @string = r3.Result.Replace("%%ProjectName%%", ProjectName);
@@ -191,13 +191,13 @@ internal class New
         File.WriteAllText("kiwi.project.json", @string);
         Console.WriteLine("Created 'kiwi.project.json' file.");
 
-        Console.WriteLine("Creating '.kiwi/plugins/__init__.py'...");
-        File.Create(".kiwi/plugins/__init__.py");
-        Console.WriteLine("Created '.kiwi/plugins/__init__.py'.");
+        Console.WriteLine("Creating 'kiwi/plugins/__init__.py'...");
+        File.Create("kiwi/plugins/__init__.py");
+        Console.WriteLine("Created 'kiwi/plugins/__init__.py'.");
 
         Console.WriteLine("Creating 'piwi.py'...");
         HttpClient client4 = new();
-        var r4 = client4.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/.kiwi/templates/piwi.py");
+        var r4 = client4.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/templates/piwi.py");
         r4.Wait();
 
         File.WriteAllText("piwi.py", r4.Result);
