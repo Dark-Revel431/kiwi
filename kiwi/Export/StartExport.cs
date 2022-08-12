@@ -59,7 +59,7 @@
             {
                 foreach (string dir in JsonObject.Export.DirectoriesToExport)
                 {
-                    CopyDirectory(dir, $"kiwi/export/{JsonObject.Project.Name}", JsonObject);
+                    CopyDirectory(dir, $"kiwi/export/{JsonObject.Project.Name}/{dir}", JsonObject);
                     Console.WriteLine($"Copied {dir}");
                 }
 
@@ -84,7 +84,10 @@
                     Environment.Exit(1);
                 }
                 JsonData JsonObject = ParseJson();
-
+                if (JsonObject.Export != null && JsonObject.Export.DirectoriesToExport == Array.Empty<string>())
+                {
+                    Environment.Exit(1);
+                }
                 if (Directory.Exists("kiwi/export"))
                 {
                     Directory.Delete("kiwi/export", true);
