@@ -1,6 +1,6 @@
 ﻿namespace kiwi.New;
 
-internal class New
+internal class StartNew
 {
     private static bool Venv { get; set; } = false;
     private static bool Main { get; set; } = true;

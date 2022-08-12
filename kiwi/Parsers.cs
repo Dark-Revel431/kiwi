@@ -7,13 +7,12 @@ internal class Parsers
         switch (Data.Args[0])
         {
             case "new":
-                New.New.Start();
+                New.StartNew.Start();
                 break;
             case "run":
+                Run.StartRun.Start();
                 break;
             case "export":
-                break;
-            case "newfile":
                 break;
             case "package":
                 break;
