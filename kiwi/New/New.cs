@@ -91,6 +91,8 @@ internal class New
 
     private static void Create()
     {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+
         Console.WriteLine($"Building {ProjectName}...");
         if (Config != null)
         {
@@ -183,17 +185,28 @@ internal class New
         r3.Wait();
 
         string @string = r3.Result.Replace("%%ProjectName%%", ProjectName);
-        @string = @string.Replace("%%ProjectPath%%", Data.Path);
+        @string = @string.Replace("%%ProjectPath%%", Data.Path.Replace('\\', '/'));
         @string = @string.Replace("%%Interpreter%%", Data.Interpreter);
 
         File.WriteAllText("kiwi.project.json", @string);
-        Console.WriteLine("Created 'kiwi.project.json' file.\n");
+        Console.WriteLine("Created 'kiwi.project.json' file.");
 
         Console.WriteLine("Creating '.kiwi/plugins/__init__.py'...");
         File.Create(".kiwi/plugins/__init__.py");
         Console.WriteLine("Created '.kiwi/plugins/__init__.py'.");
 
+        Console.WriteLine("Creating 'piwi.py'...");
+        HttpClient client4 = new();
+        var r4 = client4.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/.kiwi/templates/piwi.py");
+        r4.Wait();
+
+        File.WriteAllText("piwi.py", r4.Result);
+        Console.WriteLine("Created 'piwi.py'.\n");
+
         Console.WriteLine($"Finished building {ProjectName}!");
+
+        Console.ForegroundColor = ConsoleColor.White;
+        Environment.Exit(0);
     }
 
     internal static void Start()
