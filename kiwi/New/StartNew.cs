@@ -171,12 +171,13 @@ internal class StartNew
 
                 if (!string.IsNullOrWhiteSpace(process.StandardError.ReadToEnd()))
                 {
-                    Console.WriteLine("Error while creating 'venv':");
-                    Console.WriteLine(process.StandardError.ReadToEnd());
+                    Console.WriteLine("Error while creating 'venv'.");
+                }
+                else
+                {
+                    Console.WriteLine("Created 'venv'.");
                 }
             }
-
-            Console.WriteLine("Created 'venv'.");
         }
 
         Console.WriteLine("Creating 'kiwi.project.json' file...");
