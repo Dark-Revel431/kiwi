@@ -15,9 +15,13 @@ internal class Parsers
                 break;
             case "newfile":
                 break;
-            case "newinit":
-                break;
             case "package":
+                break;
+            case "reload":
+                break;
+            case "plugin":
+                break;
+            case "--version":
                 break;
             default:
                 break;

@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include=".kiwi\json\kiwi.project.json" />
     <Content Include=".kiwi\json\NewConfig.json" />
     <Content Include=".kiwi\templates\main.py" />
   </ItemGroup>

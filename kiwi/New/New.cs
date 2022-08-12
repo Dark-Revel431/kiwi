@@ -4,6 +4,7 @@ internal class New
 {
     private static bool Venv { get; set; } = false;
     private static bool Main { get; set; } = true;
+    private static bool ReadMe { get; set; } = true;
     private static string? Config { get; set; } = null;
     private static string ProjectName { get; set; } = "Project";
     private static String[] Directories { get; set; } = Array.Empty<string>();
@@ -26,6 +27,23 @@ internal class New
             try
             {
                 Venv = Convert.ToBoolean(Data.Args[Array.IndexOf(Data.Args, "-v") + 1].ToLower());
+            }
+            catch { }
+        }
+
+        if (Data.Args.Contains("--readme"))
+        {
+            try
+            {
+                ReadMe = Convert.ToBoolean(Data.Args[Array.IndexOf(Data.Args, "--readme") + 1].ToLower());
+            }
+            catch { }
+        }
+        else if (Data.Args.Contains("-r"))
+        {
+            try
+            {
+                ReadMe = Convert.ToBoolean(Data.Args[Array.IndexOf(Data.Args, "-r") + 1].ToLower());
             }
             catch { }
         }
@@ -103,6 +121,7 @@ internal class New
             if (JsonObjectHttp != null) Directories = JsonObjectHttp.Directories;
         }
 
+        Console.WriteLine("Creating project directories...");
         foreach (string directory in Directories)
         {
             if (directory == "%%ProjectName%%")
@@ -118,6 +137,7 @@ internal class New
 
         if (Main)
         {
+            Console.WriteLine("Creating 'main.py' file.");
             HttpClient client2 = new();
             var r2 = client2.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/.kiwi/templates/main.py");
             r2.Wait();
@@ -126,8 +146,16 @@ internal class New
             Console.WriteLine("Created 'main.py' file.");
         }
 
+        if (ReadMe)
+        {
+            Console.WriteLine("Creating 'README.md' file...");
+            File.Create("README.md");
+            Console.WriteLine("Created 'README.md' file.");
+        }
+
         if (Venv)
         {
+            Console.WriteLine("Creating 'venv'...");
             ProcessStartInfo psi = new(Data.Interpreter, "-m venv venv")
             {
                 RedirectStandardError = true,
@@ -148,10 +176,35 @@ internal class New
 
             Console.WriteLine("Created 'venv'.");
         }
+
+        Console.WriteLine("Creating 'kiwi.project.json' file...");
+        HttpClient client3 = new();
+        var r3 = client3.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/.kiwi/json/kiwi.project.json");
+        r3.Wait();
+
+        string @string = r3.Result.Replace("%%ProjectName%%", ProjectName);
+        @string = @string.Replace("%%ProjectPath%%", Data.Path);
+        @string = @string.Replace("%%Interpreter%%", Data.Interpreter);
+
+        File.WriteAllText("kiwi.project.json", @string);
+        Console.WriteLine("Created 'kiwi.project.json' file.\n");
+
+        Console.WriteLine("Creating '.kiwi/plugins/__init__.py'...");
+        File.Create(".kiwi/plugins/__init__.py");
+        Console.WriteLine("Created '.kiwi/plugins/__init__.py'.");
+
+        Console.WriteLine($"Finished building {ProjectName}!");
     }
 
     internal static void Start()
     {
+        if (Data.Args.Length < 3)
+        {
+            Console.WriteLine("Invalid args:");
+            Console.WriteLine("Usage:\nkiwi new [name] [interpreter] [args]");
+            Environment.Exit(1);
+        }
+
         try
         {
             ParseArgs();

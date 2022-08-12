@@ -1,0 +1,32 @@
+{
+  "Project": {
+    "Name": "%%ProjectName%%",
+    "Version": "1.0",
+    "Directory": "%%ProjectPath%%"
+  },
+
+  "Run": {
+    "FileToRun": "%%ProjectName%%/main.py",
+    "Args": "",
+    "Interpreter": "%%Interpreter%%"
+  },
+
+  "Export": {
+    "DirectoriesToExport": [
+      "%%ProjectName%%"
+    ],
+    "FilesToIgnore": [
+
+    ],
+    "DirectoriesToIgnore": [
+
+    ]
+  },
+
+  "Plugins": {
+    // Reload kiwi with "kiwi reload" after edit this
+    "Imported": [
+
+    ]
+  }
+}
