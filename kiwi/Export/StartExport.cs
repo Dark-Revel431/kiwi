@@ -66,7 +66,7 @@
                 if (Zip)
                 {
                     Console.WriteLine($"Zipping {JsonObject.Project.Name}...");
-                    ZipFile.CreateFromDirectory($"kiwi/export/{JsonObject.Project.Name}", $"kiwi/export/{JsonObject.Project.Name}.{JsonObject.Export.ZipExtension}");
+                    ZipFile.CreateFromDirectory($"kiwi/export/{JsonObject.Project.Name}", $"kiwi/export/{JsonObject.Project.Name}{JsonObject.Export.ZipExtension}");
                     Console.WriteLine($"Zipped {JsonObject.Project.Name}.");
                 }
             }
