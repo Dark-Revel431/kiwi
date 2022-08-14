@@ -8,8 +8,7 @@
         {
             DirectoryInfo dir = new(SourceDir);
 
-            if (!dir.Exists)
-                throw new DirectoryNotFoundException($"directory to export not found: {dir.FullName}");
+            if (!dir.Exists) throw new DirectoryNotFoundException($"directory to export not found: {dir.FullName}");
 
             DirectoryInfo[] dirs = dir.GetDirectories();
 
@@ -38,71 +37,94 @@
 
         private static JsonData ParseJson()
         {
-            string @string = File.ReadAllText("kiwi.project.json");
-            JsonData? JsonObject = JsonConvert.DeserializeObject<JsonData>(@string);
-
-            if (JsonObject != null && JsonObject.Export != null && JsonObject.Export.DirectoriesToExport == null)
+            try
             {
-                Console.WriteLine("Error, directories to export are null.");
-                Environment.Exit(1);
+                string @string = File.ReadAllText("kiwi.project.json");
+                JsonData? JsonObject = JsonConvert.DeserializeObject<JsonData>(@string);
+
+                if (JsonObject != null && JsonObject.Export != null && JsonObject.Export.DirectoriesToExport == null)
+                {
+                    throw new Exception("Directories to export are null.");
+                }
+
+                if (JsonObject == null || JsonObject.Export == null) Environment.Exit(1);
+
+                Zip = JsonObject.Export.Zip;
+                return JsonObject;
             }
-
-            if (JsonObject == null || JsonObject.Export == null) Environment.Exit(1);
-
-            Zip = JsonObject.Export.Zip;
-            return JsonObject;
+            catch
+            {
+                throw new Exception("Error while parsing 'kiwi.project.json'.");
+            }
         }
 
         private static void Export(JsonData JsonObject)
         {
+            Console.WriteLine("EXPORTING THE PROJECT...");
             if (JsonObject.Export != null && JsonObject.Project != null)
             {
                 foreach (string dir in JsonObject.Export.DirectoriesToExport)
                 {
-                    CopyDirectory(dir, $"kiwi/export/{JsonObject.Project.Name}/{dir}", JsonObject);
-                    Console.WriteLine($"Copied {dir}");
+                    try
+                    {
+                        Console.WriteLine($"Exporting {dir}...");
+                        CopyDirectory(dir, $"kiwi/export/{JsonObject.Project.Name}/{dir}", JsonObject);
+                        Console.WriteLine("Done.");
+                    }
+                    catch
+                    {
+                        throw new Exception($"Error while exporting {dir}.");
+                    }
                 }
 
                 if (Zip)
                 {
-                    Console.WriteLine($"Zipping {JsonObject.Project.Name}...");
-                    ZipFile.CreateFromDirectory($"kiwi/export/{JsonObject.Project.Name}", $"kiwi/export/{JsonObject.Project.Name}{JsonObject.Export.ZipExtension}");
-                    Console.WriteLine($"Zipped {JsonObject.Project.Name}.");
+                    try
+                    {
+                        Console.WriteLine($"Zipping {JsonObject.Project.Name}...");
+                        ZipFile.CreateFromDirectory($"kiwi/export/{JsonObject.Project.Name}", $"kiwi/export/{JsonObject.Project.Name}{JsonObject.Export.ZipExtension}");
+                        Console.WriteLine("Done.");
+                    }
+                    catch
+                    {
+                        throw new Exception($"Error while zipping {JsonObject.Project.Name}.");
+                    }
                 }
             }
+            Console.WriteLine("PROJECT EXPORTED.");
+
+            Environment.Exit(0);
         }
 
         internal static void Start()
         {
-            try
+            if (!File.Exists("kiwi.project.json"))
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Exporting...\n");
-                if (!File.Exists("kiwi.project.json"))
-                {
-                    Console.WriteLine("'kiwi.project.json' not found.");
-                    Environment.Exit(1);
-                }
-                JsonData JsonObject = ParseJson();
-                if (JsonObject.Export != null && JsonObject.Export.DirectoriesToExport.Length == 0)
-                {
-                    Console.WriteLine("Exported.");
-                    Environment.Exit(1);
-                }
-                if (Directory.Exists("kiwi/export"))
+                throw new FileNotFoundException("'kiwi.project.json' not found.");
+            }
+
+            JsonData JsonObject = ParseJson();
+
+            if (JsonObject.Export != null && JsonObject.Export.DirectoriesToExport.Length == 0)
+            {
+                Console.WriteLine("PROJECT EXPORTED.");
+                Environment.Exit(1);
+            }
+            
+            if (Directory.Exists("kiwi/export"))
+            {
+                try
                 {
                     Directory.Delete("kiwi/export", true);
                     Directory.CreateDirectory("kiwi/export");
                 }
-                
-                Export(JsonObject);
-                Console.WriteLine("Exported.");
-                Console.ForegroundColor = ConsoleColor.White;
+                catch
+                {
+                    throw new Exception("Error while deleting and re-building 'kiwi/export'");
+                }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+
+            Export(JsonObject);
         }
     }
 }

@@ -4,38 +4,38 @@ internal class StartRun
 {
     private static JsonData ParseJson()
     {
-        string @string = File.ReadAllText("kiwi.project.json");
-        JsonData? JsonObject = JsonConvert.DeserializeObject<JsonData>(@string);
-
-        if (JsonObject != null && JsonObject.Run.FileToRun == null)
-        {
-            Console.WriteLine("Error, file to run is null.");
-            Environment.Exit(1);
-        }
-
-        if (JsonObject == null) Environment.Exit(1); ;
-
-        return JsonObject;
-    }
-    internal static void Start()
-    {
         try
         {
-            if (!File.Exists("kiwi.project.json"))
+            string @string = File.ReadAllText("kiwi.project.json");
+            JsonData? JsonObject = JsonConvert.DeserializeObject<JsonData>(@string);
+
+            if (JsonObject != null && JsonObject.Run.FileToRun == null)
             {
-                Console.WriteLine("'kiwi.project.json' not found.");
+                Console.WriteLine("Error, file to run is null.");
                 Environment.Exit(1);
             }
 
-            JsonData JsonObject = ParseJson();
+            if (JsonObject == null) Environment.Exit(1); ;
 
-            var process = Process.Start(JsonObject.Run.Interpreter, $"{JsonObject.Run.FileToRun} {JsonObject.Run.Args}");
-            process.WaitForExit();
-            Environment.Exit(0);
+            return JsonObject;
         }
-        catch (Exception e)
+        catch
         {
-            Console.WriteLine(e);
+            throw new Exception("Error while parsing 'kiwi.project.json'.");
         }
+    }
+    internal static void Start()
+    {
+        if (!File.Exists("kiwi.project.json"))
+        {
+            throw new FileNotFoundException("'kiwi.project.json' not found.");
+        }
+
+        JsonData JsonObject = ParseJson();
+
+        var process = Process.Start(JsonObject.Run.Interpreter, $"{JsonObject.Run.FileToRun} {JsonObject.Run.Args}");
+        process.WaitForExit();
+
+        Environment.Exit(0);
     }
 }

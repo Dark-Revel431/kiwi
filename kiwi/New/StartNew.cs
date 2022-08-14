@@ -82,10 +82,7 @@ internal class StartNew
         }
         catch
         {
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("Error while connecting with:\n > https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/json/NewConfig.json");
-            Console.ForegroundColor = ConsoleColor.White;
-            Environment.Exit(1);
+            throw new HttpRequestException("Error while connecting with:\n > https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/json/NewConfig.json");
         }
 
         try
@@ -106,10 +103,7 @@ internal class StartNew
         }
         catch
         {
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("Error while building project directories.");
-            Console.ForegroundColor = ConsoleColor.White;
-            Environment.Exit(1);
+            throw new Exception("Error while building project directories.");
         }
 
         if (Main)
@@ -128,17 +122,11 @@ internal class StartNew
             }
             catch (HttpRequestException)
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine("Error while connecting with:\n > https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/templates/main.py");
-                Console.ForegroundColor = ConsoleColor.White;
-                Environment.Exit(1);
+                throw new HttpRequestException("Error while connecting with:\n > https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/templates/main.py");
             }
             catch 
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine("Error while building 'main.py' file.");
-                Console.ForegroundColor = ConsoleColor.White;
-                Environment.Exit(1);
+                throw new Exception("Error while building 'main.py' file.");
             }
         }
 
@@ -152,39 +140,43 @@ internal class StartNew
             }
             catch
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine("Error while building 'README.md' file.");
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Environment.Exit(1);
+                throw new Exception("Error while building 'README.md' file.");
             }
         }
 
         if (Venv)
         {
-            Console.WriteLine("Building 'venv'...");
-            ProcessStartInfo psi = new(Data.Interpreter, "-m venv venv")
+            try
             {
-                RedirectStandardError = true,
-                CreateNoWindow = true,
-                UseShellExecute = false,
-            };
-            var process = Process.Start(psi);
+                Console.WriteLine("Building 'venv'...");
+                ProcessStartInfo psi = new(Data.Interpreter, "-m venv venv")
+                {
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                };
+                var process = Process.Start(psi);
 
-            if (process != null)
+                if (process != null)
+                {
+                    process.WaitForExit();
+
+                    if (!string.IsNullOrWhiteSpace(process.StandardError.ReadToEnd()))
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.WriteLine("Error while building 'venv'.");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Environment.Exit(1);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Done.");
+                    }
+                }
+            }
+            catch
             {
-                process.WaitForExit();
-
-                if (!string.IsNullOrWhiteSpace(process.StandardError.ReadToEnd()))
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    Console.WriteLine("Error while building 'venv'.");
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Environment.Exit(1);
-                }
-                else
-                {
-                    Console.WriteLine("Done.");
-                }
+                throw new Exception("Error while building 'venv'.");
             }
         }
 
@@ -206,17 +198,11 @@ internal class StartNew
         }
         catch (HttpRequestException)
         {
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("Error while connecting with:\n > https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/json/kiwi.project.json");
-            Console.ForegroundColor = ConsoleColor.White;
-            Environment.Exit(1);
+            throw new HttpRequestException("Error while connecting with:\n > https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/json/kiwi.project.json");
         }
         catch
         {
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("Error while building 'kiwi.project.json' file.");
-            Console.ForegroundColor = ConsoleColor.White;
-            Environment.Exit(1);
+            throw new Exception("Error while building 'kiwi.project.json' file.");
         }
 
         try
@@ -227,10 +213,7 @@ internal class StartNew
         }
         catch
         {
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("Error while building 'kiwi/plugins/__init__.py' file.");
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Environment.Exit(1);
+            throw new Exception("Error while building 'kiwi/plugins/__init__.py' file.");
         }
 
         try
@@ -247,17 +230,11 @@ internal class StartNew
         }
         catch (HttpRequestException)
         {
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("Error while connecting with:\n > https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/templates/piwi.py");
-            Console.ForegroundColor = ConsoleColor.White;
-            Environment.Exit(1);
+            throw new HttpRequestException("Error while connecting with:\n > https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/templates/piwi.py");
         }
         catch
         {
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("Error while building 'piwi.py' file.");
-            Console.ForegroundColor = ConsoleColor.White;
-            Environment.Exit(1);
+            throw new Exception("Error while building 'piwi.py' file.");
         }
 
         Console.WriteLine($"BUILDED '{ProjectName}' > VERSION: {Data.Version}.");
@@ -274,15 +251,8 @@ internal class StartNew
             Environment.Exit(1);
         }
 
-        try
-        {
-            ParseArgs();
-            Create();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
-        
+        ParseArgs();
+        Create();
+
     }
 }
