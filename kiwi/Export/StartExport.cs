@@ -60,7 +60,7 @@
 
         private static void Export(JsonData JsonObject)
         {
-            Console.WriteLine("EXPORTING THE PROJECT...");
+            Console.WriteLine("EXPORTING THE PROJECT...\n\n");
             if (JsonObject.Export != null && JsonObject.Project != null)
             {
                 foreach (string dir in JsonObject.Export.DirectoriesToExport)
@@ -91,7 +91,7 @@
                     }
                 }
             }
-            Console.WriteLine("PROJECT EXPORTED.");
+            Console.WriteLine("\n\nPROJECT EXPORTED.");
 
             Environment.Exit(0);
         }
