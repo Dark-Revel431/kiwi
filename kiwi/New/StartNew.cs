@@ -5,8 +5,7 @@ internal class StartNew
     private static bool Venv { get; set; } = false;
     private static bool Main { get; set; } = true;
     private static bool ReadMe { get; set; } = true;
-    private static string? Config { get; set; } = null;
-    private static string ProjectName { get; set; } = "Project";
+    private static string ProjectName { get; set; } = string.Empty;
     private static String[] Directories { get; set; } = Array.Empty<string>();
 
     private static void ParseArgs()
@@ -64,100 +63,105 @@ internal class StartNew
             }
             catch { }
         }
-
-        if (Data.Args.Contains("--config"))
-        {
-            try
-            {
-                if (File.Exists(Data.Args[Array.IndexOf(Data.Args, "--config") + 1]))
-                {
-                    Config = Data.Args[Array.IndexOf(Data.Args, "--config") + 1];
-                }
-            }
-            catch { }
-        }
-        else if (Data.Args.Contains("-c"))
-        {
-            try
-            {
-                if (File.Exists(Data.Args[Array.IndexOf(Data.Args, "-c") + 1]))
-                {
-                    Config = Data.Args[Array.IndexOf(Data.Args, "-c") + 1];
-                }
-            }
-            catch { }
-        }
     }
 
     private static void Create()
     {
-        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine($"BUILDING '{ProjectName}' > VERSION: {Data.Version}\n\n");
 
-        Console.WriteLine($"Building {ProjectName}...");
-        if (Config != null)
+        try
         {
-            string JsonString = File.ReadAllText(Config);
-            JsonData? JsonObject = JsonConvert.DeserializeObject<JsonData>(JsonString);
-
-            if (JsonObject != null && (JsonObject.Directories == Array.Empty<string>() || JsonObject.Directories == null))
-            {
-                HttpClient client = new();
-                var r = client.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/json/NewConfig.json");
-                r.Wait();
-
-                JsonData? JsonObjectHttp = JsonConvert.DeserializeObject<JsonData>(r.Result);
-                if (JsonObjectHttp != null ) Directories = JsonObjectHttp.Directories;
-            }
-            else
-            {
-                if (JsonObject != null) Directories = JsonObject.Directories;
-            }
-        }
-        else
-        {
+            Console.WriteLine("Connecting with:\n > https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/json/NewConfig.json\n");
             HttpClient client = new();
-            var r = client.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/json/NewConfig.json");
+            var r = client.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/json/NewConfig.json");
             r.Wait();
 
             JsonData? JsonObjectHttp = JsonConvert.DeserializeObject<JsonData>(r.Result);
             if (JsonObjectHttp != null) Directories = JsonObjectHttp.Directories;
+            Console.WriteLine("Done.");
+        }
+        catch
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("Error while connecting with:\n > https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/json/NewConfig.json");
+            Console.ForegroundColor = ConsoleColor.White;
+            Environment.Exit(1);
         }
 
-        Console.WriteLine("Creating project directories...");
-        foreach (string directory in Directories)
+        try
         {
-            if (directory == "%%ProjectName%%")
+            Console.WriteLine("Building project directories...");
+            foreach (string directory in Directories)
             {
-                Directory.CreateDirectory(ProjectName);
+                if (directory == "%%ProjectName%%")
+                {
+                    Directory.CreateDirectory(ProjectName);
+                }
+                else
+                {
+                    Directory.CreateDirectory(directory);
+                }
             }
-            else
-            {
-                Directory.CreateDirectory(directory);
-            }
+            Console.WriteLine("Done.\n");
         }
-        Console.WriteLine("Created project directories.");
+        catch
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("Error while building project directories.");
+            Console.ForegroundColor = ConsoleColor.White;
+            Environment.Exit(1);
+        }
 
         if (Main)
         {
-            Console.WriteLine("Creating 'main.py' file.");
-            HttpClient client2 = new();
-            var r2 = client2.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/templates/main.py");
-            r2.Wait();
+            try
+            {
+                Console.WriteLine("Connecting with:\n > https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/templates/main.py\n");
+                HttpClient client2 = new();
+                var r2 = client2.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/templates/main.py");
+                r2.Wait();
+                Console.WriteLine("Done.\n");
 
-            File.WriteAllText($"{ProjectName}/main.py", r2.Result);
-            Console.WriteLine("Created 'main.py' file.");
+                Console.WriteLine("Building 'main.py' file.");
+                File.WriteAllText($"{ProjectName}/main.py", r2.Result);
+                Console.WriteLine("Done.");
+            }
+            catch (HttpRequestException)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.WriteLine("Error while connecting with:\n > https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/templates/main.py");
+                Console.ForegroundColor = ConsoleColor.White;
+                Environment.Exit(1);
+            }
+            catch 
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.WriteLine("Error while building 'main.py' file.");
+                Console.ForegroundColor = ConsoleColor.White;
+                Environment.Exit(1);
+            }
         }
 
         if (ReadMe)
         {
-            Console.WriteLine("Creating 'README.md' file...");
-            File.Create($"{ProjectName}/README.md");
-            Console.WriteLine("Created 'README.md' file.");
+            try
+            {
+                Console.WriteLine("Building 'README.md' file...");
+                File.Create($"{ProjectName}/README.md");
+                Console.WriteLine("Done.");
+            }
+            catch
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.WriteLine("Error while building 'README.md' file.");
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Environment.Exit(1);
+            }
         }
 
         if (Venv)
         {
-            Console.WriteLine("Creating 'venv'...");
+            Console.WriteLine("Building 'venv'...");
             ProcessStartInfo psi = new(Data.Interpreter, "-m venv venv")
             {
                 RedirectStandardError = true,
@@ -165,48 +169,99 @@ internal class StartNew
                 UseShellExecute = false,
             };
             var process = Process.Start(psi);
+
             if (process != null)
             {
                 process.WaitForExit();
 
                 if (!string.IsNullOrWhiteSpace(process.StandardError.ReadToEnd()))
                 {
-                    Console.WriteLine("Error while creating 'venv'.");
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine("Error while building 'venv'.");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Environment.Exit(1);
                 }
                 else
                 {
-                    Console.WriteLine("Created 'venv'.");
+                    Console.WriteLine("Done.");
                 }
             }
         }
 
-        Console.WriteLine("Creating 'kiwi.project.json' file...");
-        HttpClient client3 = new();
-        var r3 = client3.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/json/kiwi.project.json");
-        r3.Wait();
+        try
+        {
+            Console.WriteLine("Connecting with:\n > https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/json/kiwi.project.json\n");
+            HttpClient client3 = new();
+            var r3 = client3.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/json/kiwi.project.json");
+            r3.Wait();
+            Console.WriteLine("Done.");
 
-        string @string = r3.Result.Replace("%%ProjectName%%", ProjectName);
-        @string = @string.Replace("%%ProjectPath%%", Data.Path.Replace('\\', '/'));
-        @string = @string.Replace("%%Interpreter%%", Data.Interpreter);
+            string @string = r3.Result.Replace("%%ProjectName%%", ProjectName);
+            @string = @string.Replace("%%ProjectPath%%", Data.Path.Replace('\\', '/'));
+            @string = @string.Replace("%%Interpreter%%", Data.Interpreter);
 
-        File.WriteAllText("kiwi.project.json", @string);
-        Console.WriteLine("Created 'kiwi.project.json' file.");
+            Console.WriteLine("Building 'kiwi.project.json' file...");
+            File.WriteAllText("kiwi.project.json", @string);
+            Console.WriteLine("Done.");
+        }
+        catch (HttpRequestException)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("Error while connecting with:\n > https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/json/kiwi.project.json");
+            Console.ForegroundColor = ConsoleColor.White;
+            Environment.Exit(1);
+        }
+        catch
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("Error while building 'kiwi.project.json' file.");
+            Console.ForegroundColor = ConsoleColor.White;
+            Environment.Exit(1);
+        }
 
-        Console.WriteLine("Creating 'kiwi/plugins/__init__.py'...");
-        File.Create("kiwi/plugins/__init__.py");
-        Console.WriteLine("Created 'kiwi/plugins/__init__.py'.");
+        try
+        {
+            Console.WriteLine("Building 'kiwi/plugins/__init__.py'...");
+            File.Create("kiwi/plugins/__init__.py");
+            Console.WriteLine("Done.");
+        }
+        catch
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("Error while building 'kiwi/plugins/__init__.py' file.");
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Environment.Exit(1);
+        }
 
-        Console.WriteLine("Creating 'piwi.py'...");
-        HttpClient client4 = new();
-        var r4 = client4.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/templates/piwi.py");
-        r4.Wait();
+        try
+        {
+            Console.WriteLine("Connecting with:\n > https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/templates/piwi.py\n");
+            HttpClient client4 = new();
+            var r4 = client4.GetStringAsync("https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/templates/piwi.py");
+            r4.Wait();
+            Console.WriteLine("Done.");
 
-        File.WriteAllText("piwi.py", r4.Result);
-        Console.WriteLine("Created 'piwi.py'.\n");
+            Console.WriteLine("Building 'piwi.py'...");
+            File.WriteAllText("piwi.py", r4.Result);
+            Console.WriteLine("Done.\n\n");
+        }
+        catch (HttpRequestException)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("Error while connecting with:\n > https://raw.githubusercontent.com/Dark-Revel431/kiwi/master/kiwi/kiwi/1.0/templates/piwi.py");
+            Console.ForegroundColor = ConsoleColor.White;
+            Environment.Exit(1);
+        }
+        catch
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("Error while building 'piwi.py' file.");
+            Console.ForegroundColor = ConsoleColor.White;
+            Environment.Exit(1);
+        }
 
-        Console.WriteLine($"Finished building {ProjectName}!");
+        Console.WriteLine($"BUILDED '{ProjectName}' > VERSION: {Data.Version}.");
 
-        Console.ForegroundColor = ConsoleColor.White;
         Environment.Exit(0);
     }
 
@@ -214,8 +269,8 @@ internal class StartNew
     {
         if (Data.Args.Length < 3)
         {
-            Console.WriteLine("Invalid args:");
-            Console.WriteLine("Usage:\nkiwi new [name] [interpreter] [args]");
+            Console.WriteLine("Invalid args, usage:");
+            Console.WriteLine(" > kiwi new [name] [interpreter] [args]");
             Environment.Exit(1);
         }
 
